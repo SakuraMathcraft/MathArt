@@ -18,7 +18,6 @@ const PeanoVisualizer: React.FC = () => {
     const n = Math.pow(3, order);
     const totalPoints = n * n;
 
-    // Peano curve coordinate mapping logic (Base-3)
     const peano = (i: number): {x: number, y: number} => {
       let x = 0, y = 0, p = i;
       for (let j = 0; j < order; j++) {
@@ -34,7 +33,7 @@ const PeanoVisualizer: React.FC = () => {
     };
 
     let progress = 0;
-    const speed = 0.4; // Controlled slow iteration speed
+    const speed = 0.4;
 
     const animate = () => {
       ctx.fillStyle = '#05070a';
@@ -65,36 +64,25 @@ const PeanoVisualizer: React.FC = () => {
       ctx.stroke();
       ctx.shadowBlur = 0;
 
-      // Draw the "growth" tip
       if (progress < totalPoints) {
         const p = peano(limit);
         ctx.beginPath();
         ctx.fillStyle = '#fff';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#fff';
         ctx.arc(offsetX + p.x * step, offsetY + p.y * step, 4, 0, Math.PI * 2);
         ctx.fill();
-        ctx.shadowBlur = 0;
       }
 
       progress += speed;
       if (progress > totalPoints + 300) progress = 0;
-
       animationId = requestAnimationFrame(animate);
     };
 
-    const handleResize = () => {
+    window.addEventListener('resize', () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-    animationId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', handleResize);
-    };
+    });
+    animate();
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
   return <canvas ref={canvasRef} className="w-full h-full block bg-[#05070a]" />;
